@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+- This repository is now governed by its own generator (`package` profile, `.governance/manifest.json`, strict gate): `Statutory Integrity`, `PR Metadata` and `Secret Scan` workflows, the post-merge issue-closure workflow, `commit-msg` and `pre-commit` hooks (`bash bin/install-hooks.sh`), `.github/PROTECTION_GUIDE.md`, and `.claude/` skill and commands. `.gitleaks.toml` allowlists only the manifest.
+- `release-tags` ruleset: only an organisation admin can create, move or delete `v*` tags.
+- `.github/dependabot.yml` (monthly, grouped GitHub Actions updates into `develop`), `CODE_OF_CONDUCT.md` (Contributor Covenant 2.0), and a `## Docs update` block and `## Issues` section in the PR template.
+
+### Changed
+- Rulesets: the bypass is the Organization admin role (via pull request only), the last push must be approved, and the required checks are `Statutory Integrity`, `PR Metadata`, `Tests` and `Secret Scan` (+ `Branch Policy` on `main`). `PR Metadata` checks the PR title, so the separate `PR Title` workflow is removed.
+- This repo's own workflows use `actions/checkout` v7 and `actions/setup-node` v7, like generated repos.
+
 ## [1.2.2] - 2026-10-29
 
 ### Changed

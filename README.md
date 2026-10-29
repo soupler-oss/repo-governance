@@ -197,11 +197,15 @@ Yes, with `gov adopt`. The gate starts in *adoption mode*: unregistered docs fai
 
 ## Contributing
 
-Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first, and [CLAUDE.md](CLAUDE.md) before changing anything: it explains the architecture, the file kinds and the rules for this repository. Branch from `develop` and open the pull request against `develop`; `main` only receives `develop`. Report security problems privately per [SECURITY.md](SECURITY.md).
+Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) first, and [CLAUDE.md](CLAUDE.md) before changing anything: it explains the architecture, the file kinds and the rules for this repository. Branch from `develop` and open the pull request against `develop`; `main` only receives `develop`. Questions go to [Discussions](https://github.com/soupler-oss/repo-governance/discussions), security problems to [SECURITY.md](SECURITY.md), and everyone follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+This repository is governed by its own generator: the same gate, hooks, PR checks and rulesets it generates protect it.
 
 ```bash
-pnpm test        # generates real orgs and runs their gates, hooks and sync
-pnpm generate    # run the wizard
+bash bin/install-hooks.sh          # once per clone
+pnpm test                          # generates real orgs and runs their gates, hooks and sync
+bash bin/statutory-integrity.sh    # the governance gate CI runs
+pnpm generate                      # run the wizard
 ```
 
 ## License
