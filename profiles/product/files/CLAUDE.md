@@ -58,7 +58,7 @@ TODO — what this product does in 1–2 sentences.
 **This repo is the source of truth for:** @@repo.ownsList@@. Siblings follow it, never the reverse.
 @@/if@@
 @@else@@
-No sibling repositories are registered. Add one with `gov add-repo` from soupler-governance-template.
+No sibling repositories are registered. Add one with `gov add-repo` from repo-governance.
 @@/if@@
 @@/region@@
 

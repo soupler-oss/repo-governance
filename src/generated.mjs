@@ -57,7 +57,7 @@ ${table ? table + '\n' : ''}
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | ${ctx.date} | ${ctx.org.name} | Registry created by soupler-governance-template v${ctx.template.version} |
+| v1 | ${ctx.date} | ${ctx.org.name} | Registry created by repo-governance v${ctx.template.version} |
 `;
 }
 

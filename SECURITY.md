@@ -7,7 +7,7 @@ Only the latest release on `main` is supported.
 ## Reporting a vulnerability
 
 **Do not open a public issue.** Report privately through GitHub:
-<https://github.com/soupler-labs/soupler-governance-template/security/advisories/new>
+<https://github.com/soupler-oss/repo-governance/security/advisories/new>
 
 Include what is affected, how to reproduce it, and the impact. You will get an acknowledgement, and a fix or an explanation, as soon as the maintainer can; please allow reasonable time before public disclosure.
 

@@ -19,7 +19,7 @@ A ruleset has no concept of a PR's head branch, so "only `develop` may PR into `
 ## Applying and changing
 
 ```bash
-gov github .                                   # from soupler-governance-template: create/update all three
+gov github .                                   # from repo-governance: create/update all three
 gh api repos/@@org.github@@/@@repo.name@@/rulesets      # inspect
 ```
 

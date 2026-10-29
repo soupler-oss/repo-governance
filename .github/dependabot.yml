@@ -1,0 +1,18 @@
+# Monthly version updates, one grouped PR, into develop. Security updates for known vulnerabilities are
+# separate: they're on in the repository's settings and open as soon as needed. Every update PR runs the full
+# suite like any other; nothing merges untested. The generator has no npm dependencies, so only the GitHub
+# Actions this repo's own workflows use are tracked here; the action versions written into generated repos
+# live in profiles/ and are upgraded by hand, with a CHANGELOG entry.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
