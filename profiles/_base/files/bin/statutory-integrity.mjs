@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Statutory Integrity Verification Engine (SIVE) — managed by soupler-governance-template.
+// Statutory Integrity Verification Engine (SIVE) — managed by repo-governance.
 // Enforces change-propagation governance (L0-006). Zero dependencies; runs on every PR.
 //
 //   1. every docs/L*/ layer has a -000-artifact-registry

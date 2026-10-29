@@ -112,7 +112,7 @@ export function apply(dir, config, repo, { mode = 'init', docs = true, dryRun = 
 
   if (!dryRun) {
     const manifest = {
-      template: 'soupler-governance-template', templateVersion: TEMPLATE_VERSION,
+      template: 'repo-governance', templateVersion: TEMPLATE_VERSION,
       syncedAt: now.toISOString(), repo: repo.name, profile: repo.profile,
       config, files: manifestFiles,
     };

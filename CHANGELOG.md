@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-10-29
+
+### Changed
+- Renamed the project from `soupler-governance-template` to `repo-governance` (package `@soupler-oss/repo-governance`); it now lives at `github.com/soupler-oss/repo-governance`. Repository, clone and security-advisory URLs in `README.md`, `SECURITY.md`, `NOTICE`, `package.json` and the issue-template config now point there.
+- Generated output names the generator `repo-governance`: version-history rows in seeded docs and registries, the seeded `CHANGELOG.md`, `CLAUDE.md`, and the managed `bin/statutory-integrity.mjs` and `.github/PROTECTION_GUIDE.md`. `.governance/manifest.json` records `template: "repo-governance"`. `gov sync` updates the two managed files in existing repos; seeded files keep the old name.
+- `README.md` rewritten as a project page: what it is and why, quick start, real gate, hook and `sync` output, profiles, status and FAQ. The reference material moved into `docs/`: the wizard walkthrough into `docs/wizard.md`; what gets generated, the layers, change flow, enforcement and agent mechanisms into `docs/concepts.md`; publishing, `sync` file kinds and the full `governance.json` reference (with defaults) into `docs/usage.md`.
+
 ## [1.2.1] - 2026-10-15
 
 ### Fixed

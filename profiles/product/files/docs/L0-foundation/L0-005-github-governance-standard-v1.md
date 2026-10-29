@@ -65,4 +65,4 @@ Security/compliance findings and defect classes follow the remediation track: **
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
 | v2 | @@date@@ | @@org.name@@ | §2 — Dependabot PRs exempt from the `## Docs update` body rule (title and other body rules still apply) |
-| v1 | @@date@@ | @@org.name@@ | Initial release from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial release from repo-governance v@@template.version@@ |

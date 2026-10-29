@@ -5,4 +5,4 @@ All notable changes to `@@repo.name@@` are recorded here. Every change — code,
 ## [Unreleased]
 
 ### Added
-- Governance scaffold from soupler-governance-template v@@template.version@@ (@@date@@): doc layers, Statutory Integrity gate, hooks, workflows, rulesets, agent instructions.
+- Governance scaffold from repo-governance v@@template.version@@ (@@date@@): doc layers, Statutory Integrity gate, hooks, workflows, rulesets, agent instructions.

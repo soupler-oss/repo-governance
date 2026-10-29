@@ -44,4 +44,4 @@ bash bin/statutory-integrity.sh
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | @@date@@ | @@org.name@@ | Initial skeleton from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial skeleton from repo-governance v@@template.version@@ |
