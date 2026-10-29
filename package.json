@@ -1,6 +1,6 @@
 {
-  "name": "soupler-governance-template",
-  "version": "1.2.1",
+  "name": "@soupler-oss/repo-governance",
+  "version": "1.2.2",
   "description": "Generator for the Soupler L0\u2013L7 documentation-governance ecosystem: repos, doc layers, CI gates, hooks, rulesets and agent instructions.",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/soupler-labs/soupler-governance-template.git"
+    "url": "git+https://github.com/soupler-oss/repo-governance.git"
   },
   "author": "Soupler"
 }

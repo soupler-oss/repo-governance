@@ -77,4 +77,4 @@ A product usually spans repositories with different jobs. Each has a **profile**
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | @@date@@ | @@org.name@@ | Initial release from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial release from repo-governance v@@template.version@@ |

@@ -71,4 +71,4 @@ The canonical skeleton for every governed document in every layer (L0–L7). SIV
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | @@date@@ | @@org.name@@ | Initial release from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial release from repo-governance v@@template.version@@ |

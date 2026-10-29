@@ -51,4 +51,4 @@ One error shape and one tone for every API and user-facing surface, so clients h
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | @@date@@ | @@org.name@@ | Initial release from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial release from repo-governance v@@template.version@@ |

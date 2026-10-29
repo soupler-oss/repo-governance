@@ -42,4 +42,4 @@ Skipping WE is acceptable only when the PR is the sole evidence: mark the L7 row
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | @@date@@ | @@org.name@@ | Initial skeleton from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial skeleton from repo-governance v@@template.version@@ |

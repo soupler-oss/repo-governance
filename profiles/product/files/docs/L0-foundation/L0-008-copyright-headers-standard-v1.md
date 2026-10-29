@@ -41,4 +41,4 @@ Anything under a licence (fonts, icons, music, stock media) is recorded with its
 
 | Version | Date | Author | Summary of changes |
 |---|---|---|---|
-| v1 | @@date@@ | @@org.name@@ | Initial release from soupler-governance-template v@@template.version@@ |
+| v1 | @@date@@ | @@org.name@@ | Initial release from repo-governance v@@template.version@@ |

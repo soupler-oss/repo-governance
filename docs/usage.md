@@ -23,13 +23,33 @@ Creates `~/code/my-org/{governance.json, platform/, website/, assets/}`; each re
 
 ### Publishing to GitHub (outward-facing — always confirmed)
 
-```bash
-node bin/gov.mjs new-org ~/code/my-org --config my-org.json --github      # shows the plan, asks y/N
-node bin/gov.mjs new-org … --github --yes                                 # unattended
-node bin/gov.mjs github ~/code/my-org/platform                            # rulesets only, for an existing remote
+**Automatic (recommended).** Answer `y` to *"Create the repos on GitHub and apply branch rulesets now?"* in the wizard (or pass `--github` to `new-org`). For each repo it runs, **in this order**:
+
+```mermaid
+flowchart LR
+    A["1. Create the repo<br/>in your org"] --> B["2. Push main<br/>and develop"] --> C["3. Set develop as<br/>default branch"] --> D["4. Apply the three<br/>rulesets"]
 ```
 
-Order matters and is handled: create repo → push `main` and `develop` → set default branch → apply rulesets (rulesets would block the initial push if applied first).
+The order is not negotiable: the rulesets make `main` and `develop` PR-only, so they would reject the very first push if applied before it. The plan is printed and you confirm before anything happens; `new-org … --github --yes` skips the prompt for unattended runs.
+
+**Manual, or finishing a repo you already pushed.** If you answered `n`, created the repo yourself, or only pushed `main`:
+
+```bash
+# one command: creates the repo if missing, pushes main + develop (never resets an existing develop),
+# sets the default branch, applies the rulesets
+node bin/gov.mjs github ~/code/example-org/platform
+```
+
+Doing it by hand instead is the same four steps:
+
+```bash
+gh repo create example-org/platform --private          # 1. skip if it exists
+git push -u origin main && git push -u origin develop  # 2. both branches
+gh repo edit example-org/platform --default-branch develop   # 3.
+node bin/gov.mjs github ~/code/example-org/platform --rulesets-only   # 4.
+```
+
+> **Plan limit.** Rulesets need a paid GitHub plan (Team/Pro) for private repos, or a public repo. On a free plan step 4 is reported and skipped; everything else works, but branch protection is **not enforced** until you upgrade and re-run `--rulesets-only`.
 
 ## 2. Add a repo later
 
@@ -57,6 +77,14 @@ node bin/gov.mjs sync ~/code/my-org/platform             # apply
 
 Rules: untouched managed files update; edited ones become `.governance-new`; `--force` overwrites; seeded files are never rewritten except their `gov:begin/end` regions; improved L0 standards are reported as **ADVISORY** (diff and merge by hand — they carry your registry rows).
 
+**How `sync` treats files**
+
+| File kind | Examples | On sync |
+|---|---|---|
+| **Managed** | hooks, workflows, gate script, rulesets, the skill and commands | Updated if you haven't touched it; if you *have*, the new version is written beside it as `<file>.governance-new` for you to review. |
+| **Seeded** | `CLAUDE.md`, README, CHANGELOG, `docs/` | Written once, then yours. Only the marked `gov:begin … gov:end` regions (sibling lists, layer tables, repo topology) are refreshed. |
+| **Advisory** | L0 standards you've edited | Reported as "template has a newer version" — you merge by hand, because they carry your registry rows. |
+
 ## 5. After generating
 
 ```bash
@@ -69,22 +97,43 @@ Then fill the `TODO`s in `CLAUDE.md` (project, stack, apps map) — the agent na
 
 ## Config reference (`governance.json`)
 
-| Key | Meaning |
-|---|---|
-| `org.name` `github` `owner` `copyright` `license` | identity used in headers and docs (never an individual's name by default) |
-| `org.regulated` | adds L6 / L6.1 / L7 (audit, execution, forensics) |
-| `org.standardsRepo` | the one repo that holds L0 (default: first `product` repo) |
-| `org.defaultBranch` | `develop` (default) or `main` |
-| `org.requiredReviews` | approvals required by the rulesets (default 0) |
-| `org.codeowners` | e.g. `@example-org/maintainers` → `.github/CODEOWNERS` |
-| `layerFolders` | rename a layer folder, e.g. `{ "L3": "L3-engineering" }` |
-| `rules.noAiAttribution` | hook + CI block AI attribution (default true) |
-| `rules.releasePrTitle` | prefix for `develop`→`main` PRs (default `release`) |
-| `rules.requireDocsUpdate` | CI requires the `## Docs update` block (default true); PRs opened by `dependabot[bot]` are exempt |
-| `commands` `stack` | lint/type-check/test/install commands, node/pnpm versions → CI and CLAUDE.md |
-| `repos[].profile` | `product` · `site` · `assets` · `package` |
-| `repos[].owns` / `follows` | source-of-truth direction, rendered into sibling sections |
-| `repos[].layers` | override the profile's layer set |
+Everything the wizard asks is saved to `governance.json`, so you can skip the wizard next time.
+
+```json
+{
+  "org": {
+    "name": "Example Org",
+    "github": "example-org",
+    "owner": "Example Org",
+    "regulated": false,
+    "standardsRepo": "platform",
+    "defaultBranch": "develop"
+  },
+  "rules": { "noAiAttribution": true, "releasePrTitle": "release" },
+  "stack": { "packageManager": "pnpm", "node": "22.15.0", "pnpm": "9.15.9" },
+  "repos": [
+    { "name": "platform", "profile": "product", "description": "…", "owns": ["API contracts"] },
+    { "name": "website",  "profile": "site",    "follows": ["platform"] }
+  ]
+}
+```
+
+| Key | Meaning | Default |
+|---|---|---|
+| `org.name`, `github`, `owner`, `copyright`, `license` | Identity used in headers and docs | owner/copyright = org name; license `Proprietary` |
+| `org.regulated` | Adds L6, L6.1, L7 | `false` |
+| `org.standardsRepo` | The one repo that holds L0 | first `product` repo |
+| `org.defaultBranch` | Integration branch | `develop` |
+| `org.requiredReviews` | Approvals the rulesets require | `0` |
+| `org.codeowners` | e.g. `@example-org/maintainers` → `.github/CODEOWNERS` | none |
+| `layerFolders` | Rename a layer folder, e.g. `{ "L3": "L3-engineering" }` | defaults |
+| `rules.noAiAttribution` | Hook + CI block AI attribution | `true` |
+| `rules.releasePrTitle` | Prefix for `develop`→`main` PR titles | `release` |
+| `rules.requireDocsUpdate` | CI requires the `## Docs update` block; PRs opened by `dependabot[bot]` are exempt | `true` |
+| `commands` | install / lint / typeCheck / test | pnpm defaults |
+| `repos[].profile` | `product` · `site` · `assets` · `package` | required |
+| `repos[].follows` / `owns` | Source-of-truth direction | none |
+| `repos[].layers` | Override the type's default layers | type default |
 
 ## Extending
 

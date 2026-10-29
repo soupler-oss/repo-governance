@@ -1,4 +1,4 @@
-# soupler-governance-template — Project Instructions
+# repo-governance — Project Instructions
 
 This repository is **Soupler's governance generator**. One command stamps a complete, enforced documentation-governance ecosystem — repos, L0–L7 doc layers, CI gates, git hooks, rulesets, PR/issue templates, and `CLAUDE.md` agent instructions — into any new organisation or product. It captures an operating model that has run in production, including the corrections it accumulated, and must stay faithful to those lessons.
 
