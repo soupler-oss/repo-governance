@@ -27,7 +27,7 @@ Creates `~/code/my-org/{governance.json, platform/, website/, assets/}`; each re
 
 ```mermaid
 flowchart LR
-    A["1. Create the repo<br/>in your org"] --> B["2. Push main<br/>and develop"] --> C["3. Set develop as<br/>default branch"] --> D["4. Apply the three<br/>rulesets"]
+    A["1. Create the repo<br/>in your org"] --> B["2. Push main<br/>and develop"] --> C["3. Set main as<br/>default branch"] --> D["4. Apply the three<br/>rulesets"]
 ```
 
 The order is not negotiable: the rulesets make `main` and `develop` PR-only, so they would reject the very first push if applied before it. The plan is printed and you confirm before anything happens; `new-org … --github --yes` skips the prompt for unattended runs.
@@ -111,6 +111,8 @@ Everything the wizard asks is saved to `governance.json`, so you can skip the wi
   },
   "rules": { "noAiAttribution": true, "releasePrTitle": "release" },
   "stack": { "packageManager": "pnpm", "node": "22.15.0", "pnpm": "9.15.9" },
+  "features": { "intellisense": true },
+  "intellisense": { "tracker": "github" },
   "repos": [
     { "name": "platform", "profile": "product", "description": "…", "owns": ["API contracts"] },
     { "name": "website",  "profile": "site",    "follows": ["platform"] }
@@ -123,7 +125,8 @@ Everything the wizard asks is saved to `governance.json`, so you can skip the wi
 | `org.name`, `github`, `owner`, `copyright`, `license` | Identity used in headers and docs | owner/copyright = org name; license `Proprietary` |
 | `org.regulated` | Adds L6, L6.1, L7 | `false` |
 | `org.standardsRepo` | The one repo that holds L0 | first `product` repo |
-| `org.defaultBranch` | Integration branch | `develop` |
+| `org.defaultBranch` | Integration branch every PR targets; the generated rulesets and workflows protect `develop`, so it must be `develop` | `develop` |
+| `org.githubDefaultBranch` | The branch GitHub shows first: `main` (the released version) or `develop` | `main` |
 | `org.requiredReviews` | Approvals the rulesets require | `0` |
 | `org.codeowners` | e.g. `@example-org/maintainers` → `.github/CODEOWNERS` | none |
 | `layerFolders` | Rename a layer folder, e.g. `{ "L3": "L3-engineering" }` | defaults |
@@ -134,6 +137,8 @@ Everything the wizard asks is saved to `governance.json`, so you can skip the wi
 | `repos[].profile` | `product` · `site` · `assets` · `package` | required |
 | `repos[].follows` / `owns` | Source-of-truth direction | none |
 | `repos[].layers` | Override the type's default layers | type default |
+| `features.intellisense` | Add the [intellisense](https://github.com/soupler-oss/intellisense) AI-change gate: a managed `.githooks/pre-push` running `intellisense gate`, the `Intellisense Gate` workflow and required check, and `intellisense init` per repo | `false` |
+| `intellisense.version` / `tracker` / `agents` | The gate release the workflow pins, the task tracker (`none`, `github`, `jira`, `linear`, `beads`) and the agents `init` writes instructions for | `3.0.0` / `github` / all four |
 
 ## Extending
 

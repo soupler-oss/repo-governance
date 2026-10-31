@@ -13,12 +13,15 @@
     ".github/workflows/pr-governance.yml",
     ".github/workflows/post-merge-issue-closure.yml",
     ".github/workflows/secret-scan.yml",
+    ".github/workflows/intellisense.yml",
     ".github/governance/",
     ".github/PROTECTION_GUIDE.md",
     ".claude/skills/",
     ".claude/commands/"
   ],
   "conditional": {
-    ".github/CODEOWNERS": "org.codeowners"
+    ".github/CODEOWNERS": "org.codeowners",
+    ".github/workflows/intellisense.yml": "features.intellisense",
+    ".githooks/pre-push": "features.intellisense"
   }
 }
