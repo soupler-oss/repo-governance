@@ -56,8 +56,8 @@ export function normalizeConfig(raw) {
   stack.isPnpm = stack.packageManager === 'pnpm';
   const features = { docsSite: false, intellisense: false, ...raw.features };
   // intellisense is the AI-change risk gate: repo-governance installs and keeps it current when features.intellisense is on.
-  const intellisense = { version: '3.0.0', tracker: 'github', agents: ['claude', 'codex', 'copilot', 'cursor'], ...raw.intellisense };
-  if (!/^\d+\.\d+\.\d+$/.test(intellisense.version)) errs.push(`intellisense.version must be a release such as 2.1.0 (got "${intellisense.version}")`);
+  const intellisense = { version: '1.0.1', tracker: 'github', agents: ['claude', 'codex', 'copilot', 'cursor'], ...raw.intellisense };
+  if (!/^\d+\.\d+\.\d+$/.test(intellisense.version)) errs.push(`intellisense.version must be a release such as 1.0.1 (got "${intellisense.version}")`);
   if (!['none', 'beads', 'github', 'jira', 'linear'].includes(intellisense.tracker)) errs.push(`intellisense.tracker must be none, beads, github, jira or linear (got "${intellisense.tracker}")`);
   if (!Array.isArray(intellisense.agents)) errs.push('intellisense.agents must be a list');
   const layerFolders = { ...raw.layerFolders };

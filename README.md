@@ -27,7 +27,9 @@ Most teams write engineering standards and hope people follow them. Then the sec
 - git hooks for Conventional Commits and secret scanning;
 - GitHub rulesets: PR-only, required checks, and `main` only ever receives `develop`;
 - `CLAUDE.md`, a skill, slash commands and a session hook that make coding agents follow the same rules as people;
-- sibling awareness: each repo knows which repo owns which fact, and which way changes flow.
+- sibling awareness: each repo knows which repo owns which fact, and which way changes flow;
+- optionally, the [intellisense](https://github.com/soupler-oss/intellisense) gate, so AI-written changes to risky code
+  (auth, money, migrations) arrive with a ticket and a stated risk.
 
 It is one Node script with no dependencies. Answer a few questions and you get repos that pass their own gate from the first commit. Run `gov sync` later and they pick up improvements without losing your edits.
 
@@ -64,6 +66,7 @@ Open that repo's `CLAUDE.md` and fill in the `TODO` lines (what the product is, 
 | **Agent instructions** | A governance-first `CLAUDE.md` for each repo type, a `doc-governance` skill, slash commands and a session-start hook. |
 | **Multi-repo awareness** | Each repo knows its siblings, which repo owns which fact, and which way changes flow. |
 | **Safe updates** | `gov sync` brings generator improvements into existing repos and never overwrites a file you edited. |
+| **AI-change gate (optional)** | With `features.intellisense`, every repo also gets the [intellisense](https://github.com/soupler-oss/intellisense) gate: risky changes need a ticket and a change note, checked at push and as a required `Intellisense Gate` PR check. [How it fits](#faq) |
 
 ## See it work
 
@@ -162,6 +165,27 @@ Teams with more than one repository who want the same standards in all of them, 
 <summary><strong>How is this different from a GitHub template repository or cookiecutter?</strong></summary>
 
 A template repository is copied once and then forgotten. Cookiecutter and similar tools scaffold files. `repo-governance` also generates the **enforcement**: a CI gate, hooks and branch rulesets. It wires repos to each other (which repo owns which fact), and with `gov sync` keeps every repo current with later improvements without overwriting what your team changed.
+</details>
+
+<details>
+<summary><strong>Does it work with intellisense?</strong></summary>
+
+Yes, and each also works on its own. **repo-governance** sets up a repository: its docs, branches, PR checks and agent
+instructions. **[intellisense](https://github.com/soupler-oss/intellisense)** checks the risk of each code change:
+a change to risky paths (auth, payments, migrations, secrets) needs a task reference and a change contract before it
+can be pushed or merged.
+
+Turn it on with `"features": { "intellisense": true }` in `governance.json` (the wizard asks). Every generated or
+adopted repo then gets:
+
+- a managed `.githooks/pre-push` that runs `intellisense gate --pre-push`;
+- a `.github/workflows/intellisense.yml` workflow, and **Intellisense Gate** as a required check in the rulesets;
+- `intellisense init` run for the repo (if the `intellisense` binary is installed — `brew install
+  soupler-oss/tap/intellisense`; otherwise `gov` prints the command to run later);
+- a risk-tier line in the session brief, the `doc-governance` skill and the README.
+
+Choose the task tracker (`github`, `jira`, `linear`, `beads` or `none`) and the agents with
+`"intellisense": { "tracker": "github" }` — see the [usage guide](docs/usage.md).
 </details>
 
 <details>
