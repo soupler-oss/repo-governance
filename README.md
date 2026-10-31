@@ -101,7 +101,7 @@ And a later `gov sync` updates what you haven't touched, and leaves what you hav
 
 ```console
 $ node bin/gov.mjs sync ~/code/example-org/platform
-platform (from template v1.3.0 → v1.3.0)
+platform (from template v1.3.1 → v1.3.1)
   unchanged  18
   skipped    34
   CONFLICTS  1 — you edited these; review the .governance-new file next to each:
