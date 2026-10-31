@@ -1,6 +1,6 @@
 {
   "name": "@soupler-oss/repo-governance",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Generator for the Soupler L0–L7 documentation-governance ecosystem: repos, doc layers, CI gates, hooks, rulesets and agent instructions.",
   "private": true,
   "type": "module",

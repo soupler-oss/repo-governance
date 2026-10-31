@@ -23,7 +23,7 @@ test('features.intellisense adds the gate hook, the CI workflow and the required
   const hook = fs.readFileSync(path.join(dir, '.githooks/pre-push'), 'utf8');
   assert.match(hook, /exec intellisense gate --pre-push/);
   assert.ok(fs.statSync(path.join(dir, '.githooks/pre-push')).mode & 0o111, 'hook is executable');
-  assert.match(fs.readFileSync(path.join(dir, '.github/workflows/intellisense.yml'), 'utf8'), /soupler-oss\/intellisense@v3\.0\.0/);
+  assert.match(fs.readFileSync(path.join(dir, '.github/workflows/intellisense.yml'), 'utf8'), /soupler-oss\/intellisense@v1\.0\.1/);
   assert.match(fs.readFileSync(path.join(dir, '.github/governance/rulesets/main-develop-protection.json'), 'utf8'), /Intellisense Gate/);
   assert.match(fs.readFileSync(path.join(dir, 'bin/governance-brief.sh'), 'utf8'), /intellisense classify/);
   assert.match(out, /intellisense +not installed — finish with: .*--tracker jira/);

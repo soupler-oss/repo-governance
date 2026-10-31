@@ -136,9 +136,9 @@ Everything the wizard asks is saved to `governance.json`, so you can skip the wi
 | `commands` | install / lint / typeCheck / test | pnpm defaults |
 | `repos[].profile` | `product` · `site` · `assets` · `package` | required |
 | `repos[].follows` / `owns` | Source-of-truth direction | none |
-| `repos[].layers` | Override the type's default layers | type default |
+| `repos[].layers` | Override the type's default layers; each chosen layer gets its starter docs | type default |
 | `features.intellisense` | Add the [intellisense](https://github.com/soupler-oss/intellisense) AI-change gate: a managed `.githooks/pre-push` running `intellisense gate`, the `Intellisense Gate` workflow and required check, and `intellisense init` per repo | `false` |
-| `intellisense.version` / `tracker` / `agents` | The gate release the workflow pins, the task tracker (`none`, `github`, `jira`, `linear`, `beads`) and the agents `init` writes instructions for | `3.0.0` / `github` / all four |
+| `intellisense.version` / `tracker` / `agents` | The gate release the workflow pins, the task tracker (`none`, `github`, `jira`, `linear`, `beads`) and the agents `init` writes instructions for | `1.0.1` / `github` / all four |
 
 ## Extending
 
