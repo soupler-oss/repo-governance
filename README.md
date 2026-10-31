@@ -98,7 +98,7 @@ And a later `gov sync` updates what you haven't touched, and leaves what you hav
 
 ```console
 $ node bin/gov.mjs sync ~/code/example-org/platform
-platform (from template v1.2.2 → v1.2.2)
+platform (from template v1.3.0 → v1.3.0)
   unchanged  18
   skipped    34
   CONFLICTS  1 — you edited these; review the .governance-new file next to each:
@@ -144,7 +144,7 @@ Nothing touches GitHub without showing you the plan and waiting for `y`. Every c
 
 ## Status
 
-**1.2.x**, used to run Soupler's own repositories. Every release is tested by generating real organisations and running their gates, hooks and `sync` (`pnpm test`). Release notes are in the [CHANGELOG](CHANGELOG.md).
+**1.3**, used to run Soupler's own repositories. Every release is tested by generating real organisations and running their gates, hooks and `sync` (`pnpm test`). Release notes are in the [CHANGELOG](CHANGELOG.md).
 
 - Branch rulesets need a public repo or a paid GitHub plan (Team/Pro) for private repos. On a free plan, everything else works and the generator tells you protection isn't enforced.
 - Agent instructions are written for Claude Code. The gate, hooks, CI and rulesets work without it.

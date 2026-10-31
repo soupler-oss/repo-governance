@@ -91,7 +91,7 @@ test('invalid configs are rejected with a clear message', () => {
 test('gov create asks the questions and scaffolds a passing org', () => {
   const dir = fs.mkdtempSync(path.join(newOrg(), '..', 'create-'));
   const out = path.join(dir, 'zed');
-  const answers = ['Zed Labs', '', '', out, 'n', '', 'y', 'core', 'product', 'The product', '', 'brand tokens', 'y', 'web', 'site', 'Website', 'core', '', 'n', '', '', '', 'n', 'y'].join('\n') + '\n';
+  const answers = ['Zed Labs', '', '', out, 'n', 'y', 'n', 'core', 'product', 'The product', '', 'brand tokens', 'y', 'web', 'site', 'Website', 'core', '', 'n', '', '', '', 'n', 'y'].join('\n') + '\n';
   const r = sh('node', [path.join(path.dirname(new URL(import.meta.url).pathname), '../bin/gov.mjs'), 'create'], { input: answers });
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.ok(fs.existsSync(path.join(out, 'governance.json')));
@@ -102,7 +102,7 @@ test('gov create asks the questions and scaffolds a passing org', () => {
 test('gov create aborts cleanly when the user declines', () => {
   const dir = fs.mkdtempSync(path.join(newOrg(), '..', 'create-'));
   const out = path.join(dir, 'nope');
-  const answers = ['Zed', '', '', out, 'n', '', 'y', 'core', 'product', '', '', '', 'n', 'n', 'pnpm', '22.15.0', 'n', 'n'].join('\n') + '\n';
+  const answers = ['Zed', '', '', out, 'n', 'y', 'n', 'core', 'product', '', '', '', 'n', 'n', 'pnpm', '22.15.0', 'n', 'n'].join('\n') + '\n';
   const r = sh('node', [path.join(path.dirname(new URL(import.meta.url).pathname), '../bin/gov.mjs'), 'create'], { input: answers });
   assert.notEqual(r.status, 0);
   assert.ok(!fs.existsSync(out));

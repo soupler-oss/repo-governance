@@ -3,8 +3,8 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { TEMPLATE_ROOT, TEMPLATE_VERSION, contextFor, layersFor, readProfile } from './config.mjs';
 import { render, applyRegions } from './render.mjs';
-import { generatedFiles } from './generated.mjs';
-import { LAYERS } from './layers.mjs';
+import { generatedFiles, layerDocRoots } from './generated.mjs';
+import { LAYERS, LAYER_BY_CODE } from './layers.mjs';
 
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 export const MANIFEST_PATH = '.governance/manifest.json';
@@ -29,6 +29,12 @@ export function plan(config, repo, now = new Date()) {
   const conditional = { ...(base.conditional ?? {}), ...(profile.conditional ?? {}) };
   const out = new Map();
 
+  const add = (root, rel, dest) => {
+    const raw = fs.readFileSync(path.join(TEMPLATE_ROOT, 'profiles', root, 'files', rel));
+    const content = raw.includes(0) ? raw.toString('latin1') : render(raw.toString('utf8'), ctx, `${root}/${rel}`);
+    const mode = fs.statSync(path.join(TEMPLATE_ROOT, 'profiles', root, 'files', rel)).mode & 0o111 ? 0o755 : 0o644;
+    out.set(dest, { content, mode, kind: managed.some((m) => matches(dest, m)) ? 'managed' : 'seeded' });
+  };
   for (const root of ['_base', repo.profile]) {
     const dir = path.join(TEMPLATE_ROOT, 'profiles', root, 'files');
     for (const rel of walk(dir)) {
@@ -38,10 +44,16 @@ export function plan(config, repo, now = new Date()) {
       const cond = conditional[key];
       if (cond && !evalFlag(cond, ctx)) { out.delete(dest); continue; }
       if (profile.exclude?.includes(dest) && root === '_base') continue;
-      const raw = fs.readFileSync(path.join(dir, rel));
-      const content = raw.includes(0) ? raw.toString('latin1') : render(raw.toString('utf8'), ctx, `${root}/${rel}`);
-      const mode = fs.statSync(path.join(dir, rel)).mode & 0o111 ? 0o755 : 0o644;
-      out.set(dest, { content, mode, kind: managed.some((m) => matches(dest, m)) ? 'managed' : 'seeded' });
+      add(root, rel, dest);
+    }
+  }
+  // Layers the profile ships no starter docs for take them from the product profile (see layerDocRoots).
+  for (const l of layersFor(config, repo)) {
+    const src = `docs/${LAYER_BY_CODE[l.code].folder}`;
+    for (const root of layerDocRoots(repo, l.code, ctx).filter((r) => r !== '_base' && r !== repo.profile)) {
+      for (const rel of walk(path.join(TEMPLATE_ROOT, 'profiles', root, 'files', src))) {
+        add(root, `${src}/${rel}`, remapFolder(`${src}/${rel}`.replace(/\.tpl$/, ''), config));
+      }
     }
   }
   for (const [dest, g] of generatedFiles(config, repo, ctx)) out.set(dest, g);

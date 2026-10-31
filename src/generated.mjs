@@ -7,10 +7,24 @@ import { LAYER_BY_CODE } from './layers.mjs';
 const field = (text, key) => (text.match(new RegExp(`^\\|\\s*${key}\\s*\\|\\s*(.+?)\\s*\\|\\s*$`, 'm')) ?? [])[1] ?? '';
 const title = (text) => (text.match(/^#\s+[A-Z0-9.]+-\d{3}\s*[·\-–—]*\s*(.+)$/m) ?? [])[1]?.trim() ?? "";
 
-function shippedDocs(repo, layerFolder, ctx) {
+// The product profile carries the full set of starter layer docs.
+export const LAYER_DOCS_PROFILE = 'product';
+
+// The profiles whose starter docs a layer gets. Starter docs follow the repo's layers, not its profile: a repo that
+// opts into a layer with `repos[].layers` gets that layer's docs from the product profile unless its own profile ships
+// some. L0 standards go only to the standards repo; every other repo links to them.
+export function layerDocRoots(repo, code, ctx) {
+  const folder = LAYER_BY_CODE[code].folder;
+  const ships = (root) => fs.existsSync(path.join(TEMPLATE_ROOT, 'profiles', root, 'files', 'docs', folder));
+  const own = ['_base', repo.profile].filter(ships);
+  if (own.length || repo.profile === LAYER_DOCS_PROFILE || (code === 'L0' && !ctx.holdsStandards)) return own;
+  return ships(LAYER_DOCS_PROFILE) ? [LAYER_DOCS_PROFILE] : [];
+}
+
+function shippedDocs(repo, code, ctx) {
   const rows = new Map();
-  for (const root of ['_base', repo.profile]) {
-    const dir = path.join(TEMPLATE_ROOT, 'profiles', root, 'files', 'docs', layerFolder);
+  for (const root of layerDocRoots(repo, code, ctx)) {
+    const dir = path.join(TEMPLATE_ROOT, 'profiles', root, 'files', 'docs', LAYER_BY_CODE[code].folder);
     if (!fs.existsSync(dir)) continue;
     for (const f of fs.readdirSync(dir)) {
       if (!f.endsWith('.md') || f.includes('-000-')) continue;
@@ -33,7 +47,7 @@ function header(ctx, id, layer, extra = {}) {
 
 export function registryContent(ctx, layer, repo) {
   const id = `${layer.code}-000-artifact-registry-v1`;
-  const docs = shippedDocs(repo, LAYER_BY_CODE[layer.code].folder, ctx);
+  const docs = shippedDocs(repo, layer.code, ctx);
   const table = docs.length
     ? docs.map((d) => `| ${d.id} | ${d.title} | ${d.status} | ${d.version} | ${d.owner} | ${d.updated} |`).join('\n')
     : '';

@@ -2,7 +2,7 @@
 
 This is `@@repo.name@@` (`@@org.github@@/@@repo.name@@`) — a **shared package**: the single source of truth for content or logic that several @@org.name@@ repositories consume.
 
-**Governance applies to all work here.** Read `.claude/skills/doc-governance/SKILL.md` first. Standards (L0) live in `@@standardsRepo@@` (`@@standardsPath@@`).
+**Governance applies to all work here.** Read `.claude/skills/doc-governance/SKILL.md` first. @@#if hasStandards@@Standards (L0) live in `@@standardsRepo@@` (`@@standardsPath@@`).@@/if@@
 
 @@#region siblings@@
 ## Consumers and siblings
