@@ -37,7 +37,12 @@ export function normalizeConfig(raw) {
   org.copyright ??= org.name;
   org.license ??= 'Proprietary';
   org.codeowners ??= '';
+  // The integration branch every PR targets. The generated rulesets, workflows and docs protect and name `develop`.
   org.defaultBranch ??= 'develop';
+  if (org.defaultBranch !== 'develop') errs.push(`org.defaultBranch must be "develop": the generated rulesets, workflows and docs protect and target develop (got "${org.defaultBranch}")`);
+  // The branch GitHub shows first. `main` holds the released version, so visitors see what users get.
+  org.githubDefaultBranch ??= 'main';
+  if (![org.defaultBranch, 'main'].includes(org.githubDefaultBranch)) errs.push(`org.githubDefaultBranch must be main or ${org.defaultBranch} (got "${org.githubDefaultBranch}")`);
   org.regulated ??= false;
   org.visibility ??= 'private';
   // Who may bypass the PR rules (still only via a pull request, never a direct push). Personal GitHub accounts have no
@@ -49,7 +54,12 @@ export function normalizeConfig(raw) {
   const commands = { install: 'pnpm install --frozen-lockfile', lint: 'pnpm lint', typeCheck: 'pnpm type-check', test: 'pnpm test', ...raw.commands };
   const stack = { packageManager: 'pnpm', node: '22.15.0', pnpm: '9.15.9', ...raw.stack };
   stack.isPnpm = stack.packageManager === 'pnpm';
-  const features = { docsSite: false, ...raw.features };
+  const features = { docsSite: false, intellisense: false, ...raw.features };
+  // intellisense is the AI-change risk gate: repo-governance installs and keeps it current when features.intellisense is on.
+  const intellisense = { version: '3.0.0', tracker: 'github', agents: ['claude', 'codex', 'copilot', 'cursor'], ...raw.intellisense };
+  if (!/^\d+\.\d+\.\d+$/.test(intellisense.version)) errs.push(`intellisense.version must be a release such as 2.1.0 (got "${intellisense.version}")`);
+  if (!['none', 'beads', 'github', 'jira', 'linear'].includes(intellisense.tracker)) errs.push(`intellisense.tracker must be none, beads, github, jira or linear (got "${intellisense.tracker}")`);
+  if (!Array.isArray(intellisense.agents)) errs.push('intellisense.agents must be a list');
   const layerFolders = { ...raw.layerFolders };
 
   const repos = (raw.repos ?? []).map((r) => {
@@ -74,7 +84,7 @@ export function normalizeConfig(raw) {
   if (org.standardsRepo && !seen.has(org.standardsRepo)) errs.push(`org.standardsRepo "${org.standardsRepo}" is not a repo`);
 
   if (errs.length) throw new Error(`Invalid governance config:\n  - ${errs.join('\n  - ')}`);
-  return { version: 1, org, rules, commands, stack, features, layerFolders, repos };
+  return { version: 1, org, rules, commands, stack, features, intellisense, layerFolders, repos };
 }
 
 export function loadConfig(file) {
@@ -109,12 +119,17 @@ export function contextFor(config, repo, now = new Date()) {
     };
   });
   const checks = (profile.requiredChecks ?? []).filter((c) => !c.when || has[c.when] !== false).map((c) => c.name ?? c);
+  if (config.features.intellisense) checks.push('Intellisense Gate');
+  // The standards repo only has L0 docs when its profile ships the L0 layer; never point at docs that will not exist.
+  const standards = config.repos.find((r) => r.name === config.org.standardsRepo);
+  const hasStandards = Boolean(standards) && layersFor(config, standards).some((l) => l.code === 'L0');
   return {
     org: config.org, repo: { ...repo, ownsList: repo.owns.join('; '), hasOwns: repo.owns.length > 0, followsList: (repo.follows ?? []).join(', ') },
     profile: { name: repo.profile, role: profile.role },
     rules: config.rules, commands: config.commands, stack: config.stack, features: config.features,
     year: String(now.getFullYear()), date: iso,
-    layers, has, holdsStandards, standardsRepo: config.org.standardsRepo,
+    layers, has, hasLayers: layers.length > 0, holdsStandards, hasStandards, standardsRepo: config.org.standardsRepo,
+    intellisense: { ...config.intellisense, agentsList: config.intellisense.agents.join(',') },
     standardsPath: holdsStandards ? 'docs/L0-foundation' : `../${config.org.standardsRepo}/docs/L0-foundation`,
     siblings, hasSiblings: siblings.length > 0, repos: config.repos,
     checks, checksJson: checks.map((c) => `{ "context": "${c}" }`).join(',\n            '),

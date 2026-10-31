@@ -1,6 +1,7 @@
 # Branch Protection Guide
 
-@@org.name@@ uses **GitHub Flow with a promotion branch**: feature → `develop` → `main`. Protection is enforced by **repository rulesets**, not classic branch protection — `gh api repos/.../branches/<branch>/protection` returns 404 by design.
+@@org.name@@ uses **GitHub Flow with a promotion branch**: feature → `develop` → `main`. GitHub's default branch is
+`@@org.githubDefaultBranch@@`; pull requests target `develop` (the `Branch Policy` check rejects anything else into `main`). Protection is enforced by **repository rulesets**, not classic branch protection — `gh api repos/.../branches/<branch>/protection` returns 404 by design.
 
 ## Rulesets (source of truth: `.github/governance/rulesets/*.json`)
 

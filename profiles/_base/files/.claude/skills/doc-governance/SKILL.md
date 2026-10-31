@@ -6,6 +6,14 @@ description: Use BEFORE starting any change in this repo — feature, fix, refac
 # Doc governance — how every change is made in @@repo.name@@
 
 This repo is governed by the **L0–L7 documentation layer system**. Code is the last thing that changes, never the first. Follow these steps for *every* task, however small. If a step does not apply, say so explicitly — do not skip silently.
+@@#if !hasLayers@@
+
+> **This repo has no documentation layers of its own** (no `docs/L*` folders). Steps 1–4 still decide *which repo* owns the design@@#if hasStandards@@ — the standards live in `@@standardsRepo@@` (`@@standardsPath@@`)@@/if@@ — but nothing here needs registering: record the change in `CHANGELOG.md` and `README.md`, and say in your report that the layer chain was not applicable.
+@@/if@@
+@@#if features.intellisense@@
+
+> **Risk tier:** this repo also runs the intellisense gate. Run `intellisense classify` before you start: a Tier 1+ change needs a task trailer on each commit and one change contract (`intellisense contract new "<title>"`).
+@@/if@@
 
 ## 1. Classify the change (one category)
 
@@ -33,7 +41,7 @@ Missing layer? Write it, register it, *then* implement.
 
 ## 4. Mechanics of a doc change
 
-- Filename: `[LL]-[NNN]-[slug]-v[N].md`, kebab-case (`@@standardsPath@@/L0-002-naming-convention-version-control-v1.md`). Numbers are never reused.
+- Filename: `[LL]-[NNN]-[slug]-v[N].md`, kebab-case (`docs/L0-foundation/L0-002-naming-convention-version-control-v1.md`). Numbers are never reused.
 - Header block per `L0-001` (Document ID must equal the filename; Version and Last Updated bump on every edit; add a Version history row).
 - **Register it** in the layer's `-000-artifact-registry-v1.md` in the same commit. When you edit an artifact, update its registry row's Version and Last Updated too — SIVE fails on a stale row.
 - Always update `CHANGELOG.md`. Update `README.md` when setup, stack or public behaviour changes.

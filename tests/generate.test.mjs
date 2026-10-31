@@ -153,3 +153,39 @@ test('PR Metadata exempts Dependabot PRs from the Docs update block, and only th
   assert.equal(check('dependabot[bot]', 'bump a dependency', bump).status, 1, 'Dependabot titles are still checked');
   assert.equal(check('a-person', 'feat(x): y', '## Docs update\n- Status: `EXEMPT`\n- Notes: comment-only change').status, 0);
 });
+
+test('a repo that opts into layers gets their starter docs, whatever its profile', () => {
+  const cfg = JSON.parse(fs.readFileSync(example('new-org.governance.json'), 'utf8'));
+  cfg.repos = [{ name: 'tool', profile: 'package', description: 'A tool.', layers: ['L0', 'L2', 'L3', 'L4', 'L6', 'L6.1', 'L7'] }];
+  const dir = tmp();
+  const file = path.join(dir, 'governance.json');
+  fs.writeFileSync(file, JSON.stringify(cfg));
+  const r = gov(['new-org', path.join(dir, 'org'), '--config', file]);
+  assert.equal(r.status, 0, r.stderr + r.stdout);
+  const repo = path.join(dir, 'org', 'tool');
+  for (const p of ['docs/L0-foundation/L0-001-master-document-template-v1.md', 'docs/L2-product/L2-000-artifact-registry-v1.md',
+    'docs/L3-architecture/L3-001-system-architecture-v1.md', 'docs/L4-infrastructure/L4-001-local-dev-setup-v1.md',
+    'docs/L6-remediation/L6-001-remediation-protocol-v1.md', 'docs/L6.1-remediation-execution/L6.1-000-artifact-registry-v1.md',
+    'docs/L7-forensics/L7-001-master-registry-v1.md']) {
+    assert.ok(fs.existsSync(path.join(repo, p)), p);
+  }
+  assert.ok(!fs.existsSync(path.join(repo, 'docs/L5-operations')), 'no starter docs for a layer it did not choose');
+  const gate = sh('bash', ['bin/statutory-integrity.sh'], { cwd: repo });
+  assert.equal(gate.status, 0, gate.stdout + gate.stderr);
+});
+
+test('GitHub shows main by default; work still targets develop', async () => {
+  const { normalizeConfig } = await import('../src/config.mjs');
+  const { githubPlan } = await import('../src/github.mjs');
+  const cfg = JSON.parse(fs.readFileSync(example('new-org.governance.json'), 'utf8'));
+  const config = normalizeConfig(cfg);
+  assert.equal(config.org.defaultBranch, 'develop');
+  assert.equal(config.org.githubDefaultBranch, 'main');
+  const plan = githubPlan(config, config.repos[0], tmp()).join('\n');
+  assert.match(plan, /push initial commit to main and develop/);
+  assert.match(plan, /set GitHub's default branch to main/);
+  assert.match(read('platform/.github/PROTECTION_GUIDE.md'), /GitHub's default branch is\n`main`; pull requests target `develop`/);
+  assert.throws(() => normalizeConfig({ ...cfg, org: { ...cfg.org, defaultBranch: 'trunk' } }), /defaultBranch must be "develop"/);
+  assert.throws(() => normalizeConfig({ ...cfg, org: { ...cfg.org, githubDefaultBranch: 'release' } }), /githubDefaultBranch must be main or develop/);
+  assert.equal(normalizeConfig({ ...cfg, org: { ...cfg.org, githubDefaultBranch: 'develop' } }).org.githubDefaultBranch, 'develop');
+});

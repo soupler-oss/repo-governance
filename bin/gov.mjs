@@ -73,6 +73,22 @@ function initGit(dir, config) {
   git(dir, 'checkout', config.org.defaultBranch);
 }
 
+// With features.intellisense, the repo also gets intellisense's policy, rules and agent instructions. The pre-push hook
+// and the CI workflow come from repo-governance (.githooks/pre-push, .github/workflows/intellisense.yml), so
+// `intellisense init` runs without its own hook and workflow. Without the binary, say how to finish.
+function intellisenseInit(dir, config, dryRun) {
+  if (!config.features.intellisense || dryRun || fs.existsSync(path.join(dir, '.intellisense.yml'))) return;
+  const which = spawnSync('intellisense', ['version'], { encoding: 'utf8' });
+  const args = ['init', '--yes', '--no-hook', '--dir', dir, '--tracker', config.intellisense.tracker, '--agents', config.intellisense.agents.join(',')];
+  if (which.status !== 0) {
+    log(`  intellisense  not installed — finish with: brew install soupler-oss/tap/intellisense && intellisense ${args.join(' ')}`);
+    return;
+  }
+  if (!fs.existsSync(path.join(dir, '.git'))) git(dir, 'init', '-b', 'main');
+  const r = spawnSync('intellisense', args, { encoding: 'utf8' });
+  log(r.status === 0 ? `  intellisense  set up (${which.stdout.trim()}; tracker: ${config.intellisense.tracker})` : `  intellisense  init failed:\n${r.stdout}${r.stderr}`);
+}
+
 async function confirm(question, yes) {
   if (yes) return true;
   if (!process.stdin.isTTY) { log(`${question}\n  (non-interactive: pass --yes to proceed)`); return false; }
@@ -98,6 +114,7 @@ async function runNewOrg(orgDir, config, flags) {
     const dir = path.join(orgDir, repo.name);
     if (!dryRun) fs.mkdirSync(dir, { recursive: true });
     summarize(repo.name, apply(dir, config, repo, { mode: 'init', dryRun }));
+    intellisenseInit(dir, config, dryRun);
     if (!dryRun) initGit(dir, config);
   }
   if (flags.github && !dryRun) {
@@ -141,8 +158,9 @@ async function interactive() {
     const dirAnswer = await p.ask('Folder to create everything in', defaultDir);
     const orgDir = path.resolve(dirAnswer.replace(/^~(?=$|\/)/, process.env.HOME ?? '~'));
     const regulated = await p.yesNo('Regulated / audit-sensitive (adds L6 remediation, L6.1 execution, L7 forensics layers)?', false);
-    const defaultBranch = await p.ask('Integration branch (PRs target this; main only receives it)', 'develop');
     const noAi = await p.yesNo('Block AI attribution (Co-Authored-By etc.) in commits and PRs?', true);
+    const useIntellisense = await p.yesNo('Add the intellisense gate (risk tiers: Tier 1+ AI changes need a task and a contract, at push and in CI)?', true);
+    const tracker = useIntellisense ? await p.ask('  task tracker for task references (none/github/jira/linear/beads)', 'github') : 'none';
 
     log('\nRepository types:');
     for (const pr of profiles) log(`  ${pr.name.padEnd(8)} ${pr.role}`);
@@ -165,8 +183,10 @@ async function interactive() {
     const orgGithub = await p.yesNo('Create the repos on GitHub and apply branch rulesets now? (asks again before touching GitHub)', false);
 
     const config = normalizeConfig({
-      org: { name, owner, github, regulated, standardsRepo, defaultBranch },
+      org: { name, owner, github, regulated, standardsRepo },
       rules: { noAiAttribution: noAi },
+      features: { intellisense: useIntellisense },
+      intellisense: { tracker },
       stack: { packageManager: pm, node },
       commands: pm === 'pnpm' ? {} : { install: `${pm} install`, lint: `${pm} run lint`, typeCheck: `${pm} run type-check`, test: `${pm} test` },
       repos,
@@ -176,6 +196,7 @@ async function interactive() {
     log(`  Location   ${orgDir}`);
     log(`  Layers     ${regulated ? 'regulated (L6/L6.1/L7 included)' : 'standard'}`);
     for (const r of config.repos) log(`  Repo       ${r.name}  [${r.profile}]${r.name === standardsRepo ? '  (holds L0 standards)' : ''}`);
+    log(`  Gate       ${useIntellisense ? `intellisense (tracker: ${tracker})` : 'none'}`);
     log(`  GitHub     ${orgGithub ? 'create repos + rulesets (will confirm)' : 'not now'}`);
     if (!(await p.yesNo('\nCreate this now?', true))) throw new Error('Cancelled — nothing was written');
     return { orgDir, config, github: orgGithub };
@@ -213,6 +234,7 @@ async function main() {
         if (isNew) fs.mkdirSync(dir, { recursive: true });
         else if (!fs.existsSync(dir)) continue;
         summarize(repo.name, apply(dir, config, repo, { mode: isNew ? 'init' : 'sync', dryRun }));
+        if (isNew) intellisenseInit(dir, config, dryRun);
         if (isNew && !dryRun) initGit(dir, config);
       }
       break;
@@ -223,6 +245,7 @@ async function main() {
       const repo = config.repos.find((r) => r.name === flags.repo);
       if (!repo) throw new Error(`--repo must be one of: ${config.repos.map((r) => r.name).join(', ')}`);
       summarize(repo.name, apply(dir, config, repo, { mode: 'adopt', docs: Boolean(flags.docs), dryRun }));
+      intellisenseInit(dir, config, dryRun);
       if (!flags.docs) log('\n(managed files only — pass --docs to also seed CLAUDE.md, README, CHANGELOG, doc layers)');
       break;
     }
@@ -237,6 +260,7 @@ async function main() {
       const check = Boolean(flags.check);
       const r = apply(dir, m.config, repo, { mode: 'sync', dryRun: dryRun || check, force: Boolean(flags.force) });
       summarize(`${m.repo} (from template v${m.templateVersion} → v${TEMPLATE_VERSION})`, r);
+      if (!check) intellisenseInit(dir, m.config, dryRun);
       for (const a of advisories(dir, m.config, repo)) log(`  ADVISORY   ${a.file}: template has ${a.template}, you have ${a.local} — review the template copy`);
       if (check && (r.written.length || r.updated.length || r.regions.length || r.conflicts.length)) { log('\ngovernance drift detected'); process.exitCode = 1; }
       break;

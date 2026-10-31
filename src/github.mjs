@@ -15,7 +15,7 @@ export function githubPlan(config, repo, dir) {
   return [
     `create ${config.org.visibility} repo ${full} (if it does not exist)`,
     `push initial commit to main and ${config.org.defaultBranch}`,
-    `set default branch to ${config.org.defaultBranch}`,
+    `set GitHub's default branch to ${config.org.githubDefaultBranch}`,
     `apply rulesets from ${path.join(dir, '.github/governance/rulesets')}: ${rulesetFiles(dir).join(', ') || '(none found)'}`,
   ];
 }
@@ -79,7 +79,7 @@ export function publishRepo(config, repo, dir, log = console.log) {
     log(`  ${p.ok ? '✓' : '✗'} push ${b}${p.ok ? '' : ' — ' + p.err}`);
     if (!p.ok) throw new Error(`push ${b} failed`);
   }
-  const d = sh('gh', ['repo', 'edit', full, '--default-branch', config.org.defaultBranch]);
-  log(`  ${d.ok ? '✓' : '✗'} default branch ${config.org.defaultBranch}${d.ok ? '' : ' — ' + d.err}`);
+  const d = sh('gh', ['repo', 'edit', full, '--default-branch', config.org.githubDefaultBranch]);
+  log(`  ${d.ok ? '✓' : '✗'} default branch ${config.org.githubDefaultBranch}${d.ok ? '' : ' — ' + d.err}`);
   applyRulesets(config, repo, dir, log);
 }

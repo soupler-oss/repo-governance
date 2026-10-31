@@ -1,0 +1,10 @@
+#!/bin/sh
+# pre-push — runs the intellisense gate: Tier 1+ commits need a task trailer and the change a contract.
+# Managed by repo-governance (features.intellisense). CI runs the same gate from the PR's base branch, so this
+# hook is the early warning, not the guard.
+if ! command -v intellisense >/dev/null 2>&1; then
+  echo "[pre-push] intellisense is not installed — gate SKIPPED locally (CI still runs it)." >&2
+  echo "           Install: brew install soupler-oss/tap/intellisense   (or see https://github.com/soupler-oss/intellisense#install)" >&2
+  exit 0
+fi
+exec intellisense gate --pre-push "$@"

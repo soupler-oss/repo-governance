@@ -1,0 +1,20 @@
+# Runs the intellisense gate on every pull request: each change must carry the evidence its risk tier needs
+# (task reference, change contract), and the generated agent instructions must match .intellisense.yml.
+# Managed by repo-governance (features.intellisense); the policy itself is .intellisense.yml, owned by this repo.
+name: Intellisense
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Intellisense Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: soupler-oss/intellisense@v@@intellisense.version@@

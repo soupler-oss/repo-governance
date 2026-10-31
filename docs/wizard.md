@@ -20,8 +20,7 @@ Below is a complete, realistic run for a hypothetical company **Example Org**, b
 | # | Question | Example answer | What it does |
 |---|---|---|---|
 | 5 | **Regulated / audit-sensitive?** | `n` for most products; `y` if you handle personal data, payments, health, or must prove how defects were fixed | `y` adds the remediation layers **L6** (audit + plan), **L6.1** (execution evidence) and **L7** (forensic chain of custody), plus the remediation rules in `CLAUDE.md`. `n` keeps L0–L5 for product repos. |
-| 6 | **Integration branch** | *(Enter → `develop`)* | The branch all work PRs into. `main` only ever receives this branch. Baked into rulesets, `CLAUDE.md`, hooks and the default branch on GitHub. Keep `develop` unless you really want a single-branch flow. |
-| 7 | **Block AI attribution in commits and PRs?** | *(Enter → `y`)* | `y`: the `commit-msg` hook rejects `Co-Authored-By: Claude`, "Generated with…" and session links, and CI rejects them in PR bodies. `n`: those checks aren't generated. |
+| 6 | **Block AI attribution in commits and PRs?** | *(Enter → `y`)* | `y`: the `commit-msg` hook rejects `Co-Authored-By: Claude`, "Generated with…" and session links, and CI rejects them in PR bodies. `n`: those checks aren't generated. |
 
 ### Part 3 — The repositories
 
