@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-31
+
+### Fixed
+- `features.intellisense` pinned the GitHub Action to `soupler-oss/intellisense@v3.0.0`, a release that does not
+  exist, so the generated `Intellisense Gate` check could not run. The default is now `1.0.1`, the current release.
+- README: explains the intellisense integration (what it adds, how to turn it on) in "What you get" and the FAQ.
+
 ## [1.3.0] - 2026-10-31
 
 ### Added
